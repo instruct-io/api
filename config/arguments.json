@@ -1,0 +1,15 @@
+{
+  "endpoints": {
+    "example_endpoint": {
+      "create_example": ["attr1", "attr2", "attr3"],
+      "get": ["id"],
+      "update": ["id"],
+      "delete": ["id"]
+    }
+  },
+  "models": {
+    "example": {
+      "init": ["attr1", "attr2", "attr3"]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "website_name": "Instruct.io",
+  "website_link": "<< TBD >>",
+  "database": {
+    "development": {
+      "url": "<< TBD >>",
+      "key": "<< TBD >>"
+    },
+    "production": {
+      "url": "<< TBD >>",
+      "key": "<< TBD >>"
+    }
+  },
+  "JWT": {
+    "secret": "ProfessorLynnCarter'sWisdom.FurinaXHuTaoXAyakXScaramoucheaMain.42069",
+    "access_expiry": 8,
+    "refresh_expiry": 720,
+    "password_reset_expiry": 5
+  }
+}
