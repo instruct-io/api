@@ -13,9 +13,9 @@ from flask_jwt_extended import (  # noqa
 from flask import request
 
 # Grab base MVC related modules for endpoints
-from models.example import Example  # noqa
+from models.example_ import Example  # noqa
 from ._base import param_check, error_handler, ARGS  # noqa
-from controllers.example import ExampleControl
+from controllers.example_ import ExampleControl
 
 #
 #   CREATE OPERATIONS

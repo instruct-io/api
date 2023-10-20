@@ -1,7 +1,7 @@
 # Imports
 from util.dict_obj import DictObj
 from ._base import Controller
-from models.example import Example
+from models.example_ import Example
 from typing import Any
 import uuid
 

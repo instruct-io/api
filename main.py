@@ -5,7 +5,7 @@ from flask import Flask
 
 # Endpoint imports
 # region
-from endpoints.example import create_example
+from endpoints.example_ import create_example
 
 # endregion
 

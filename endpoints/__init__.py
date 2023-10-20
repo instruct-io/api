@@ -7,4 +7,4 @@ create_example = Blueprint("create_example", __name__)
 # endregion
 
 # Import views
-from . import example  # noqa
+from . import example_  # noqa
