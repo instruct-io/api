@@ -10,7 +10,7 @@ import traceback
 ARGS = arguments.endpoints
 
 
-def success_response(message: str, **kwargs: Any) -> dict:
+def success(message: str, **kwargs: Any) -> dict:
     """Returns a message with a success status"""
 
     # Prep the message
@@ -21,7 +21,7 @@ def success_response(message: str, **kwargs: Any) -> dict:
     return message, 200
 
 
-def client_error_response(message: str, **kwargs: Any) -> dict:
+def client_error(message: str, **kwargs: Any) -> dict:
     """Returns a message with a client error status"""
 
     # Prep the message
@@ -32,7 +32,7 @@ def client_error_response(message: str, **kwargs: Any) -> dict:
     return message, 400
 
 
-def server_error_response(message: str, **kwargs: Any) -> dict:
+def server_error(message: str, **kwargs: Any) -> dict:
     """Returns a message with a server error status"""
     # Prep the message
     message = {"status": "error", "message": message}
@@ -42,7 +42,7 @@ def server_error_response(message: str, **kwargs: Any) -> dict:
     return message, 500
 
 
-def param_check(required_params: List[str]) -> object:
+def arg_check(required_params: List[str]) -> object:
     """Method that checks for minimum parameters"""
 
     def decorator(func: object) -> object:
@@ -57,12 +57,12 @@ def param_check(required_params: List[str]) -> object:
 
             # Return error if the body was empty
             if data is None:
-                return client_error_response("JSON body is empty")
+                return client_error("JSON body is empty")
 
             # Check if the given arguments has the minimum arguments
             for arg in required_params:
                 if arg not in data.keys():
-                    return client_error_response(
+                    return client_error(
                         "Call needs the following arguments: "
                         + ", ".join(required_params)
                     )
@@ -93,7 +93,7 @@ def error_handler(func: object) -> object:
         except Exception:
             print(f"Caught an exception in {func.__name__}():")
             traceback.print_exc()
-            return server_error_response("A server error occurred")
+            return server_error("A server error occurred")
 
     # Return the wrapper
     return wrapper

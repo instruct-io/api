@@ -5,6 +5,12 @@
       "get": ["id"],
       "update": ["id"],
       "delete": ["id"]
+    },
+    "authentication": {
+      "register": ["email", "password"],
+      "login": ["email", "password"],
+      "who_am_i": [],
+      "refresh": ["refresh_token"]
     }
   },
   "models": {

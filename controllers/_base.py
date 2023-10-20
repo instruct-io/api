@@ -18,6 +18,7 @@ class Controller:
         db_spec = config.database.development
 
     # Set create supabase connection based on the database specifications
+    supabase = None
     if db_spec.url != "<< TBD >>" or db_spec.key != "<< TBD >>":
         supabase = create_client(db_spec.url, db_spec.key)
 
@@ -25,7 +26,7 @@ class Controller:
     DB_SPECS = db_spec
     CONFIG = config
 
-    def sendError(message: str, **kwargs: Any) -> dict:
+    def error(message: str, **kwargs: Any) -> dict:
         """Error message format method"""
 
         # Prep the message
@@ -35,7 +36,7 @@ class Controller:
         # Return the success message
         return message
 
-    def sendSuccess(message: str, **kwargs: Any) -> dict:
+    def success(message: str, **kwargs: Any) -> dict:
         """Success message format method"""
 
         # Prep the message

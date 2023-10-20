@@ -25,7 +25,7 @@ class ExampleControl(Controller):
         example_obj = Example(attr1="a", attr2="b", attr3="c", attr4="d")
 
         # Return a statement
-        return Controller.sendSuccess(
+        return Controller.success(
             "Example created",
             id=data.id,
             kwargs=kwargs,

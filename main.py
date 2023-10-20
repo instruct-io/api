@@ -6,6 +6,7 @@ from flask import Flask
 # Endpoint imports
 # region
 from endpoints.example_ import create_example
+from endpoints.authentication import register
 
 # endregion
 
@@ -78,9 +79,14 @@ def my_expired_token_callback(*kwargs):
 #   region
 #
 
-# /example/
+# */example/
 # region
 app.register_blueprint(create_example, url_prefix="/example/")
+# endregion
+
+# */authentication/
+# region
+app.register_blueprint(register, url_prefix="/authentication/")
 # endregion
 
 #   endregion
