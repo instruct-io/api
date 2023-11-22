@@ -3,8 +3,8 @@
   "website_link": "<< TBD >>",
   "database": {
     "development": {
-      "url": "<< TBD >>",
-      "key": "<< TBD >>"
+      "url": "https://jzuyihauatjprrsqfizu.supabase.co",
+      "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dXlpaGF1YXRqcHJyc3FmaXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTc4MzAwNTAsImV4cCI6MjAxMzQwNjA1MH0.0KMODAhg4XYInk_v1m-SdFKn-ptMknTle17ni9auxwU"
     },
     "production": {
       "url": "<< TBD >>",

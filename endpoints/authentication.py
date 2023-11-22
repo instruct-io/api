@@ -1,5 +1,5 @@
 # Import blueprints(s)
-from . import register
+from . import register, login
 
 # Flask related libraries
 from flask import request
@@ -34,14 +34,10 @@ def register_endpoint(**kwargs):
         return client_error("Email or password not provided")
 
     # Create new user
-    response = DictObj(supabase.auth.sign_up(data.email, data.password))
-
-    # Check if the registration was successful
-    if response.get("error"):
-        return client_error(response.error.message)
+    supabase.auth.sign_up({"email": data.email, "password": data.password})
 
     # Return success if all is good
-    return success(response.get("data"))
+    return success("Registration complete. Check your Email.")
 
 
 #   endregion
@@ -51,7 +47,30 @@ def register_endpoint(**kwargs):
 #   region
 #
 
-#   ! N/A
+
+@login.route("/login/", methods=["POST"])
+@arg_check(ARGS.authentication.login)
+@error_handler
+def login_endpoint(**kwargs):
+    """Endpoint to handle the login of users into the application"""
+
+    # Extract data from the JSON body
+    data = DictObj(request.get_json())
+
+    # Send error if email or password is not provided
+    if not data.email or not data.password:
+        return client_error("Email or password not provided")
+
+    # Login the user
+    user = supabase.auth.sign_in_with_password(
+        {"email": data.email, "password": data.password}
+    )
+    print()
+    print(user)
+
+    # Return success if all is good
+    return success("Logged in")
+
 
 #   endregion
 
