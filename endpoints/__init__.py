@@ -12,4 +12,7 @@ refresh = Blueprint("refresh", __name__)
 # */instructions/
 # region
 create_instruction_group = Blueprint("create_instruction_group", __name__)
+get_instruction_group_instructions = Blueprint(
+    "get_instruction_group_instructions", __name__
+)
 # endregion

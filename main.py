@@ -6,7 +6,10 @@ from flask import Flask
 # Endpoint imports
 # region
 from endpoints.authentication import register, login
-from endpoints.instructions import create_instruction_group
+from endpoints.instructions import (
+    create_instruction_group,
+    get_instruction_group_instructions,
+)
 
 # endregion
 
@@ -88,6 +91,9 @@ app.register_blueprint(login, url_prefix="/authentication/")
 # */instructions/
 # region
 app.register_blueprint(create_instruction_group, url_prefix="/instructions/")
+app.register_blueprint(
+    get_instruction_group_instructions, url_prefix="/instructions/"
+)
 # endregion
 
 #   endregion
