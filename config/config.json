@@ -4,7 +4,7 @@
   "database": {
     "development": {
       "url": "https://jzuyihauatjprrsqfizu.supabase.co",
-      "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dXlpaGF1YXRqcHJyc3FmaXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTc4MzAwNTAsImV4cCI6MjAxMzQwNjA1MH0.0KMODAhg4XYInk_v1m-SdFKn-ptMknTle17ni9auxwU"
+      "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dXlpaGF1YXRqcHJyc3FmaXp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5NzgzMDA1MCwiZXhwIjoyMDEzNDA2MDUwfQ.GorU5HeynrKjrSFU9B-C6xI75s-dH97QC5_PK1Nr7zM"
     },
     "production": {
       "url": "<< TBD >>",

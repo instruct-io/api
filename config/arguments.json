@@ -8,9 +8,10 @@
     },
     "authentication": {
       "register": ["email", "password"],
-      "login": ["email", "password"],
-      "who_am_i": [],
-      "refresh": ["refresh_token"]
+      "login": ["email", "password"]
+    },
+    "instructions": {
+      "create_instruction_group": ["name"]
     }
   },
   "models": {
