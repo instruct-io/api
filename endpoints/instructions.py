@@ -1,5 +1,5 @@
 # Import blueprint(s)
-from . import create_instruction_group, get_instruction_group_instructions
+from . import create_instruction_group, get_instructions, update_instructions
 
 # Import JWT related libraries
 from flask_jwt_extended import (  # noqa
@@ -38,7 +38,7 @@ def create_instruction_group_endpoint(**kwargs):
     res = InstructionControl.create_instruction_group(**data)
 
     # Return the result of the new creation of an instruction group
-    return res
+    return res, 400 if res.status == "error" else 200
 
 
 #   endregion
@@ -49,10 +49,8 @@ def create_instruction_group_endpoint(**kwargs):
 #
 
 
-@get_instruction_group_instructions.route(
-    "/get_instruction_group_instructions/", methods=["POST"]
-)
-@arg_check(ARGS.instructions.get_instruction_group_instructions)
+@get_instructions.route("/get_instructions/", methods=["POST"])
+@arg_check(ARGS.instructions.get_instructions)
 @error_handler
 def get_instruction_group_instructions_endpoint(**kwargs):
     """Endpoint to handle the creation of a new instruction group"""
@@ -61,10 +59,10 @@ def get_instruction_group_instructions_endpoint(**kwargs):
     data = DictObj(request.get_json())
 
     # Create a new instruction group
-    res = InstructionControl.get_instruction_group_instructions(data.ig_uid)
+    res = InstructionControl.get_instructions(data.ig_uid)
 
     # Return the result of the new creation of an instruction group
-    return res
+    return res, 400 if res.status == "error" else 200
 
 
 #   endregion
@@ -74,7 +72,24 @@ def get_instruction_group_instructions_endpoint(**kwargs):
 #   region
 #
 
-#   ! N/A
+
+@update_instructions.route("/update_instructions/", methods=["POST"])
+@arg_check(ARGS.instructions.update_instructions)
+@error_handler
+def update_instructions_endpoint(**kwargs):
+    """Endpoint to handle the update of an instruction group"""
+
+    # Extract data from the JSON body
+    data = DictObj(request.get_json())
+
+    # Update an instruction group
+    res = InstructionControl.update_instructions(
+        data.ig_uid, data.instructions
+    )
+
+    # Return the result of the new creation of an instruction group
+    return res, 400 if res.status == "error" else 200
+
 
 #   endregion
 

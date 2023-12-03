@@ -17,10 +17,10 @@
     },
     "hide-files.files": [],
     "editor.rulers": [
-        80
+        79
     ],
     "black-formatter.args": [
         "--line-length",
-        "80"
+        "79"
     ]
 }

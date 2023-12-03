@@ -6,7 +6,8 @@
     },
     "instructions": {
       "create_instruction_group": ["name"],
-      "get_instruction_group_instructions": ["ig_uid"]
+      "get_instructions": ["ig_uid"],
+      "update_instructions": ["ig_uid", "instructions"]
     }
   },
   "models": {

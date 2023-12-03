@@ -65,6 +65,8 @@ def login_endpoint(**kwargs):
     user = supabase.auth.sign_in_with_password(
         {"email": data.email, "password": data.password}
     )
+
+    # ! DEBUG
     print()
     print(user)
 
