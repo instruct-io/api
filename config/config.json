@@ -11,11 +11,5 @@
       "key": "<< TBD >>"
     }
   },
-  "JWT": {
-    "secret": "ProfessorLynnCarter'sWisdom.FurinaXHuTaoXAyakXScaramoucheaMain.42069",
-    "access_expiry": 8,
-    "refresh_expiry": 720,
-    "password_reset_expiry": 5
-  },
   "id_regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 }

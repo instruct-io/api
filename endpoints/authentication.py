@@ -10,6 +10,7 @@ from ._base import arg_check, error_handler, client_error, success, ARGS
 
 # Miscellaneous imports
 from util.dict_obj import DictObj
+from pprint import pprint  # noqa
 
 # Extract supabase connection from base controller
 supabase = Controller.supabase
@@ -66,12 +67,14 @@ def login_endpoint(**kwargs):
         {"email": data.email, "password": data.password}
     )
 
-    # ! DEBUG
-    print()
-    print(user)
-
     # Return success if all is good
-    return success("Logged in")
+    return success(
+        {
+            "access": user.session.access_token,
+            "refresh": user.session.refresh_token,
+            "expires": user.session.expires_in,
+        }
+    )
 
 
 #   endregion
