@@ -100,6 +100,7 @@ class InstructionControl(Controller):
 
         # Iterate through the list and the each IG UID's name
         owner_groups = []
+        pprint(ig_uids)
         for i in ig_uids[1]:
             i = DictObj(i)
             res, _ = (
