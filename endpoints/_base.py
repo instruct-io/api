@@ -99,68 +99,28 @@ def error_handler(func: object) -> object:
     return wrapper
 
 
-#
-#   ARCHIVED FUNCTIONS
-#
+def token_required(func: object) -> object:
+    """Decorator for require token"""
 
-# region
-# def is_root(func: object) -> object:
-#     """Wrapper to determine if the user is an admin"""
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        """Wrapping definition"""
 
-#     @wraps(func)
-#     @jwt_required()
-#     def wrapper(*args: Any, **kwargs: Any) -> Any:
-#         """Wrapper that checks if the user has the correct permissions"""
+        # Extract the JWT token from the Authorization header
+        auth_header = request.headers.get("Authorization")
+        if auth_header:
+            try:
+                token_type, token = auth_header.split()
+                if token_type.lower() != "bearer":
+                    raise ValueError("Invalid token type")
+            except ValueError:
+                return {"error": "Invalid token format"}, 401
+        else:
+            return {"error": "Authorization header is missing"}, 401
 
-#         # Get user's permissions based on the user's given ID
-#         id = get_jwt_identity()["_id"]
-#         user = UserAccess.get_user(id)
-#         user_permissions = set(user.message.info.permissions)
+        # Add token to kwargs and call the original function
+        kwargs["access_token"] = token
+        return func(*args, **kwargs)
 
-#         # Check if the user has root key
-#         root = config.root_permission_string in user_permissions
-
-#         # Return the function with information provided
-#         return func(*args, **kwargs, isRoot=root, id=id)
-
-#     # Return the functionality of the wrapper
-#     return wrapper
-# endregion
-
-# region
-# def permissions_required(required_permissions: List[str]) -> object:
-#     """Function to decorate endpoints with needed permissions"""
-
-#     # Modify required_permission so that the root permission key is included
-#     required_permissions.insert(0, config.root_permission_string)
-
-#     def decorator(func: object) -> object:
-#         """Decorator definition for this functionality"""
-
-#         @wraps(func)
-#         @jwt_required()
-#         def wrapper(*args: Any, **kwargs: Any) -> Any:
-#             """Wrapper that checks if the user has the correct permissions"""
-
-#             # Get user's permissions based on the user's given ID
-#             id = get_jwt_identity()["_id"]
-#             user = UserAccess.get_user(id)
-#             user_permissions = set(user.message.info.permissions)
-
-#             # IF the user does not have sufficient permissions, deny the user
-#             if not user_permissions.intersection(required_permissions):
-#                 return client_error_response(
-#                     "You don't have access to this feature"
-#                 )
-
-#             # If so, continue on with the function that is being decorated
-#             else:
-#                 # Return the function with information provided
-#                 return func(*args, **kwargs)
-
-#         # Return the functionality of the wrapper
-#         return wrapper
-
-#     # Return the functionality of the decorator
-#     return decorator
-# endregion
+    # Return the wrapper
+    return decorated_function

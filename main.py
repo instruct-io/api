@@ -9,14 +9,11 @@ from endpoints.authentication import register, login
 from endpoints.instructions import (
     create_instruction_group,
     get_instructions,
+    get_instruction_groups,
     update_instructions,
 )
 
 # endregion
-
-# Miscellaneous Imports
-# ? UNNEEDED :: from config.config import config
-# ? UNNEEDED :: from datetime import timedelta
 import os
 
 
@@ -30,49 +27,6 @@ app = Flask(__name__)
 
 # Set CORS for the application
 CORS(app, methods=["POST", "GET"])
-
-# ? UNNEEDED :: # Initialize JWT functionalities
-# app.config["JWT_SECRET_KEY"] = config.JWT.secret
-# app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
-#     hours=config.JWT.access_expiry
-# )
-# app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
-#     hours=config.JWT.refresh_expiry
-# )
-# jwt = JWTManager(app)
-
-
-# # ? UNNEEDED :: # Define the blacklist checker for JWT
-# @jwt.token_in_blocklist_loader
-# def check_if_token_in_blacklist(jwt_header, jwt_payload):
-#     """Function to test if the user's token is blacklisted"""
-
-#     # TODO: Create relation to store blacklisted tokens
-#     """
-#     # Get the JWT token information
-#     jti = jwt_payload["jti"]
-
-#     # Check if the token is blacklisted
-#     query = DataAccessBase.BLACKLIST_COL.find_one({"access_jti": jti})
-
-#     # Return true if it is, false if not
-#     return query is not None
-#     """
-
-#     # * TEMP: Return false until TODO is accomplished
-#     return False
-
-
-# # ? UNNEEDED :: # Customize expired token message
-# @jwt.expired_token_loader
-# def my_expired_token_callback(*kwargs):
-#     """Function to customize the expired token message"""
-
-#     # Return a custom error message
-#     return {
-#         "status": "expired",
-#         "message": "Your access is expired",
-#     }, 401
 
 
 #   endregion
@@ -93,6 +47,7 @@ app.register_blueprint(login, url_prefix="/authentication/")
 # region
 app.register_blueprint(create_instruction_group, url_prefix="/instructions/")
 app.register_blueprint(get_instructions, url_prefix="/instructions/")
+app.register_blueprint(get_instruction_groups, url_prefix="/instructions/")
 app.register_blueprint(update_instructions, url_prefix="/instructions/")
 # endregion
 

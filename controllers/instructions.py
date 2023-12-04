@@ -4,7 +4,7 @@ from util.dict_obj import DictObj
 from models.instruction_group import InstructionGroup
 from ._base import Controller
 from typing import List
-from pprint import pprint # noqa
+from pprint import pprint  # noqa
 import uuid
 import re
 
@@ -21,7 +21,7 @@ class InstructionControl(Controller):
 
     @staticmethod
     @Controller.return_dict_obj
-    def create_instruction_group(name: str) -> DictObj:
+    def create_instruction_group(name: str, access_token: str) -> DictObj:
         "Create a new instruction group"
 
         # Prep data to be inserted+
@@ -31,10 +31,24 @@ class InstructionControl(Controller):
             f"{i_uid[:8]}-{i_uid[8:12]}-{i_uid[12:16]}-"
             + f"{i_uid[16:20]}-{i_uid[20:]}"
         )
+        o_uid = str(uuid.uuid4().hex)
+        o_uid = (
+            f"{o_uid[:8]}-{o_uid[8:12]}-{o_uid[12:16]}-"
+            + f"{o_uid[16:20]}-{o_uid[20:]}"
+        )
 
         # Insert a record for the instruction group
         supabase.table("instruction_group").insert(
             {"ig_uid": ig_uid, "group_name": name, "start_point": i_uid}
+        ).execute()
+
+        # Insert a record for the ownership table
+        supabase.table("ownership").insert(
+            {
+                "ownership_uid": o_uid,
+                "account_uid": supabase.auth.get_user(access_token).user.id,
+                "ig_uid": ig_uid,
+            }
         ).execute()
 
         # Create a starting instruction for the instruction group
@@ -67,6 +81,39 @@ class InstructionControl(Controller):
         # Return a message if any error occurred
         except Exception:
             return Controller.error("Instruction group not found")
+
+    @staticmethod
+    @Controller.return_dict_obj
+    def get_instruction_groups(access_token: str) -> DictObj:
+        """Controller to get the user's instruction groups"""
+
+        # Get user ID
+        user_id = supabase.auth.get_user(access_token).user.id
+
+        # Get a list of IG_UIDs
+        ig_uids, _ = (
+            supabase.table("ownership")
+            .select("ig_uid")
+            .eq("account_uid", user_id)
+            .execute()
+        )
+
+        # Iterate through the list and the each IG UID's name
+        owner_groups = []
+        for i in ig_uids[1]:
+            i = DictObj(i)
+            res, _ = (
+                supabase.table("instruction_group")
+                .select("group_name")
+                .eq("ig_uid", i.ig_uid)
+                .execute()
+            )
+            owner_groups.append(
+                {"ig_uid": i.ig_uid, "group_name": res[1][0]["group_name"]}
+            )
+
+        # Return list of owned instruction groups
+        return Controller.success(owner_groups)
 
     @staticmethod
     @Controller.return_dict_obj
@@ -221,9 +268,7 @@ class InstructionControl(Controller):
         # Iterate through the original and delete records
         for i in original_map:
             if i not in new_map:
-                supabase.table("instruction").delete().eq(
-                    "i_uid", i
-                ).execute()
+                supabase.table("instruction").delete().eq("i_uid", i).execute()
 
         # Iterate through the new instructions and update as such
         for i in new_map:
