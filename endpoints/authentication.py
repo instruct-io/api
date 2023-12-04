@@ -1,5 +1,5 @@
 # Import blueprints(s)
-from . import register, login
+from . import register, login, refresh
 
 # Flask related libraries
 from flask import request
@@ -39,6 +39,28 @@ def register_endpoint(**kwargs):
 
     # Return success if all is good
     return success("Registration complete. Check your Email.")
+
+
+@refresh.route("/refresh/", methods=["POST"])
+@arg_check(ARGS.authentication.refresh)
+@error_handler
+def refresh_endpoint(**kwargs):
+    """Endpoint to handle the refresh of users' authentication"""
+
+    # Extract data from the JSON body
+    data = DictObj(request.get_json())
+
+    # Create new user
+    user = supabase.auth.refresh_session(data["refresh"])
+
+    # Return success if all is good
+    return success(
+        {
+            "access": user.session.access_token,
+            "refresh": user.session.refresh_token,
+            "expires": user.session.expires_in,
+        }
+    )
 
 
 #   endregion

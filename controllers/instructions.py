@@ -89,7 +89,6 @@ class InstructionControl(Controller):
 
         # Get user ID
         user_id = supabase.auth.get_user(access_token).user.id
-
         # Get a list of IG_UIDs
         ig_uids, _ = (
             supabase.table("ownership")

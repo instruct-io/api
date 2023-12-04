@@ -5,7 +5,7 @@ from flask import Flask
 
 # Endpoint imports
 # region
-from endpoints.authentication import register, login
+from endpoints.authentication import register, refresh, login
 from endpoints.instructions import (
     create_instruction_group,
     get_instructions,
@@ -40,6 +40,7 @@ CORS(app, methods=["POST", "GET"])
 # */authentication/
 # region
 app.register_blueprint(register, url_prefix="/authentication/")
+app.register_blueprint(refresh, url_prefix="/authentication/")
 app.register_blueprint(login, url_prefix="/authentication/")
 # endregion
 

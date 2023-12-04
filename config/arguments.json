@@ -2,6 +2,7 @@
   "endpoints": {
     "authentication": {
       "register": ["email", "password"],
+      "refresh": ["refresh"],
       "login": ["email", "password"]
     },
     "instructions": {

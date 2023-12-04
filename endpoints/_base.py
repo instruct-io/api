@@ -3,6 +3,7 @@ from config.config import arguments
 from typing import List, Any
 from functools import wraps
 from flask import request
+from gotrue.errors import AuthApiError
 import traceback
 
 
@@ -88,6 +89,10 @@ def error_handler(func: object) -> object:
         try:
             return func(*args, **kwargs)
 
+        # If the error is an invalid access token, send that message
+        except AuthApiError as e:
+            return server_error(str(e))
+
         # If the exception occurs, print the error to the console and
         # return a server error response
         except Exception:
@@ -106,7 +111,7 @@ def token_required(func: object) -> object:
     def decorated_function(*args, **kwargs):
         """Wrapping definition"""
 
-        # Extract the JWT token from the Authorization header
+        # Extract the access JWT token from the Authorization header
         auth_header = request.headers.get("Authorization")
         if auth_header:
             try:
