@@ -10,7 +10,8 @@ from endpoints.instructions import (
     create_instruction_group,
     get_instructions,
     get_instruction_groups,
-    update_instructions, 
+    update_instructions,
+    save_checkpoint,
 )
 
 # endregion
@@ -51,6 +52,7 @@ app.register_blueprint(create_instruction_group, url_prefix="/instructions/")
 app.register_blueprint(get_instructions, url_prefix="/instructions/")
 app.register_blueprint(get_instruction_groups, url_prefix="/instructions/")
 app.register_blueprint(update_instructions, url_prefix="/instructions/")
+app.register_blueprint(save_checkpoint, url_prefix="/instructions/")
 # endregion
 
 #   endregion

@@ -89,6 +89,7 @@ class InstructionControl(Controller):
 
         # Get user ID
         user_id = supabase.auth.get_user(access_token).user.id
+
         # Get a list of IG_UIDs
         ig_uids, _ = (
             supabase.table("ownership")
@@ -319,3 +320,69 @@ class InstructionControl(Controller):
 
         # Return result
         return Controller.success("Update is a success")
+
+    @staticmethod
+    @Controller.return_dict_obj
+    def save_checkpoint(i_uid: str, ig_uid: str, access_token: str) -> DictObj:
+        """Controller to handle the saving of a user's checkpoint"""
+
+        # Check if the instruction group exists
+        ig = InstructionControl.get_instruction_group_info(ig_uid)
+        if ig.status == "error":
+            return ig
+
+        # Check if the instruction exists
+        try:
+            _ = (
+                supabase.table("instruction")
+                .select("*")
+                .eq("i_uid", i_uid)
+                .eq("ig_uid", ig_uid)
+                .execute()
+            )
+        except Exception:
+            return Controller.error("Instruction doesn't exist")
+
+        # Get user ID
+        user_id = supabase.auth.get_user(access_token).user.id
+
+        # Gather the savepoint ID
+        (_, data), _ = (
+            supabase.table("save_data")
+            .select("*")
+            .eq("account_uid", user_id)
+            .eq("ig_uid", ig_uid)
+            .execute()
+        )
+
+        # If there's no existing checkpoint, make one
+        if not data:
+            # Make savepoint IDs
+            sp_uid = str(uuid.uuid4().hex)
+            sp_uid = (
+                f"{sp_uid[:8]}-{sp_uid[8:12]}-{sp_uid[12:16]}-"
+                + f"{sp_uid[16:20]}-{sp_uid[20:]}"
+            )
+
+            # Insert data
+            supabase.table("save_data").insert(
+                {
+                    "savepoint_uid": sp_uid,
+                    "account_uid": user_id,
+                    "ig_uid": ig_uid,
+                    "i_uid": i_uid,
+                }
+            ).execute()
+
+        # If not, update it
+        else:
+            supabase.table("save_data").update(
+                {
+                    "i_uid": i_uid,
+                }
+            ).eq(
+                "account_uid", user_id
+            ).eq("ig_uid", ig_uid).execute()
+
+        # Send updated status
+        return Controller.success("Checkpoint saved")

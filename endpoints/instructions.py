@@ -4,6 +4,7 @@ from . import (
     get_instructions,
     get_instruction_groups,
     update_instructions,
+    save_checkpoint,
 )
 
 # Import JWT related libraries
@@ -37,7 +38,7 @@ from util.dict_obj import DictObj
 def create_instruction_group_endpoint(**kwargs):
     """Endpoint to handle the creation of a new instruction group"""
 
-    # Extract data from the JSON body
+    # Extract data from the JSON body and insert user ID
     data = DictObj(request.get_json())
     data.access_token = kwargs["access_token"]
 
@@ -110,6 +111,23 @@ def update_instructions_endpoint(**kwargs):
     # Return the result of the new creation of an instruction group
     return res, 400 if res.status == "error" else 200
 
+
+@save_checkpoint.route("/save_checkpoint/", methods=["POST"])
+@arg_check(ARGS.instructions.save_checkpoint)
+@token_required
+@error_handler
+def save_checkpoint_endpoint(**kwargs):
+    """Endpoint to save the checkpoint of a user"""
+
+    # Extract data from the JSON body and insert user ID
+    data = DictObj(request.get_json())
+    data.access_token = kwargs["access_token"]
+
+    # Save the user's checkpoint
+    res = InstructionControl.save_checkpoint(**data)
+
+    # Return the result of the new creation of an instruction group
+    return res, 400 if res.status == "error" else 200
 
 #   endregion
 
