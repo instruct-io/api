@@ -4,6 +4,7 @@ from . import (
     get_instructions,
     get_instruction_groups,
     update_instructions,
+    get_checkpoint,
     save_checkpoint,
 )
 
@@ -81,6 +82,24 @@ def get_instruction_groups_endpoint(**kwargs):
 
     # Get user's instruction groups
     res = InstructionControl.get_instruction_groups(kwargs["access_token"])
+
+    # Return the result of the new creation of an instruction group
+    return res, 400 if res.status == "error" else 200
+
+
+@get_checkpoint.route("/get_checkpoint/", methods=["POST"])
+@arg_check(ARGS.instructions.get_checkpoint)
+@token_required
+@error_handler
+def get_checkpoint_endpoint(**kwargs):
+    """Endpoint to get a user's checkpoint based on the IG UID passed"""
+
+    # Extract data from the JSON body and insert user ID
+    data = DictObj(request.get_json())
+    data.access_token = kwargs["access_token"]
+
+    # Get instructions from instruction group
+    res = InstructionControl.get_checkpoint(**data)
 
     # Return the result of the new creation of an instruction group
     return res, 400 if res.status == "error" else 200

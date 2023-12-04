@@ -9,6 +9,7 @@
       "create_instruction_group": ["name"],
       "get_instructions": ["ig_uid"],
       "update_instructions": ["ig_uid", "instructions"],
+      "get_checkpoint": ["ig_uid"],
       "save_checkpoint": ["ig_uid", "i_uid"]
     }
   },

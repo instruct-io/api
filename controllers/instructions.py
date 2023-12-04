@@ -150,6 +150,31 @@ class InstructionControl(Controller):
 
     @staticmethod
     @Controller.return_dict_obj
+    def get_checkpoint(ig_uid: str, access_token: str) -> DictObj:
+        """Controller to get the checkpoint data for the user's sessions"""
+
+        # Check if the instruction group exists
+        ig = InstructionControl.get_instruction_group_info(ig_uid)
+        if ig.status == "error":
+            return ig
+
+        # Get user ID
+        user_id = supabase.auth.get_user(access_token).user.id
+
+        # Gather the savepoint ID
+        (_, data), _ = (
+            supabase.table("save_data")
+            .select("*")
+            .eq("account_uid", user_id)
+            .eq("ig_uid", ig_uid)
+            .execute()
+        )
+
+        # Return the savepoint content
+        return Controller.success(data[0]["i_uid"] if data else "N/A")
+
+    @staticmethod
+    @Controller.return_dict_obj
     def update_instructions(
         ig_uid: str, new_instructions: List[dict]
     ) -> DictObj:

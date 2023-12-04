@@ -15,5 +15,6 @@ create_instruction_group = Blueprint("create_instruction_group", __name__)
 get_instructions = Blueprint("get_instructions", __name__)
 get_instruction_groups = Blueprint("get_instruction_groups", __name__)
 update_instructions = Blueprint("update_instructions", __name__)
+get_checkpoint = Blueprint("get_checkpoint", __name__)
 save_checkpoint = Blueprint("save_checkpoint", __name__)
 # endregion
