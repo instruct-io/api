@@ -1,12 +1,19 @@
 # Import blueprints(s)
-from . import register, login, refresh
+from . import register, refresh, login, who_am_i
 
 # Flask related libraries
 from flask import request
 
 # Grab base MVC related modules for endpoints
 from controllers._base import Controller
-from ._base import arg_check, error_handler, client_error, success, ARGS
+from ._base import (
+    arg_check,
+    error_handler,
+    client_error,
+    success,
+    token_required,
+    ARGS,
+)
 
 # Miscellaneous imports
 from util.dict_obj import DictObj
@@ -97,6 +104,17 @@ def login_endpoint(**kwargs):
             "expires": user.session.expires_in,
         }
     )
+
+
+@who_am_i.route("/who_am_i/", methods=["POST"])
+@token_required
+@error_handler
+def who_am_i_endpoint(**kwargs):
+    """Endpoint to get the user's credentials"""
+
+    # Return the user's information
+    user = supabase.auth.get_user(kwargs["access_token"])
+    return success(user.user.id)
 
 
 #   endregion
