@@ -38,11 +38,19 @@ class InstructionControl(Controller):
         )
 
         # Insert a record for the instruction group
+        # Since Supabase handles the SQL for us this is the command that
+        #   supabase is running in the backend to perform these commands
+        #   on a PSQL database
+        # INSERT INTO instruction_group (ig_uid, group_name, start_point)
+        #   VALUES (ig_uid, name, i_uid);
         supabase.table("instruction_group").insert(
             {"ig_uid": ig_uid, "group_name": name, "start_point": i_uid}
         ).execute()
 
         # Insert a record for the ownership table
+        # INSERT INTO ownership (ownership_uid, account_uid, ig_uid)
+        # VALUES (o_uid, supabase.auth.get_user(access_token).user.id,
+        #   ig_uid,);
         supabase.table("ownership").insert(
             {
                 "ownership_uid": o_uid,
@@ -52,6 +60,8 @@ class InstructionControl(Controller):
         ).execute()
 
         # Create a starting instruction for the instruction group
+        # INSERT INTO instruction (i_uid, ig_uid, instruction_title)
+        # VALUES (i_uid, ig_uid, f"{name} Step #1"));
         supabase.table("instruction").insert(
             {
                 "i_uid": i_uid,
@@ -70,6 +80,9 @@ class InstructionControl(Controller):
 
         # Fetch and return information about the given ig_uid
         try:
+            # SELECT *
+            # FROM instruction_group
+            # WHERE ig_uid = 'ig_uid';
             data = (
                 supabase.table("instruction_group")
                 .select("*")
@@ -91,6 +104,9 @@ class InstructionControl(Controller):
         user_id = supabase.auth.get_user(access_token).user.id
 
         # Get a list of IG_UIDs
+        # SELECT ig_uid
+        # FROM ownership
+        # WHERE account_uid = 'user_id';
         ig_uids, _ = (
             supabase.table("ownership")
             .select("ig_uid")
@@ -103,6 +119,9 @@ class InstructionControl(Controller):
         pprint(ig_uids)
         for i in ig_uids[1]:
             i = DictObj(i)
+            # SELECT group_name
+            # FROM instruction_group
+            # WHERE ig_uid = 'ig_uid';
             res, _ = (
                 supabase.table("instruction_group")
                 .select("group_name")
@@ -128,6 +147,9 @@ class InstructionControl(Controller):
         ig = ig.message
 
         # Get all instructions that fall under the instruction group
+        # SELECT *
+        # FROM instruction
+        # WHERE ig_uid = 'your_ig_uid_value';
         data = (
             supabase.table("instruction")
             .select("*")
@@ -163,6 +185,10 @@ class InstructionControl(Controller):
         user_id = supabase.auth.get_user(access_token).user.id
 
         # Gather the savepoint ID
+        # SELECT *
+        # FROM save_data
+        # WHERE account_uid = user_id
+        # AND ig_uid = ig_uid;
         (_, data), _ = (
             supabase.table("save_data")
             .select("*")
@@ -294,6 +320,8 @@ class InstructionControl(Controller):
         # Iterate through the original and delete records
         for i in original_map:
             if i not in new_map:
+                # DELETE FROM instruction
+                # WHERE i_uid = i;
                 supabase.table("instruction").delete().eq("i_uid", i).execute()
 
         # Iterate through the new instructions and update as such
@@ -303,6 +331,13 @@ class InstructionControl(Controller):
 
             # If the iteration exists in the original, update
             if i in original_map and original_map[i] != new_map[i]:
+                # UPDATE instruction
+                # SET
+                # prev = item.prev,
+                # next = item.next,
+                # instruction_title = item_instruction_title,
+                # description = item.description
+                # WHERE i_uid = i;
                 supabase.table("instruction").update(
                     {
                         "prev": item.prev,
@@ -324,6 +359,16 @@ class InstructionControl(Controller):
                     )
 
                 # Insert into instruction table
+                # INSERT INTO instruction (i_uid, prev, next, ig_uid,
+                #   instruction_title, description)
+                # VALUES (
+                # 'your_i_uid_value',
+                # item.prev,
+                # item.next,
+                # ig_uid,
+                # item.instruction_title,
+                # item.description
+                # );
                 supabase.table("instruction").insert(
                     {
                         "i_uid": i_uid,
@@ -336,6 +381,10 @@ class InstructionControl(Controller):
                 ).execute()
 
         # Update the starting node pointer for the instruction group
+        # UPDATE instruction_group
+        # SET
+        # start_point = starting_node.i_uid
+        # WHERE ig_uid = ig_uid';
         supabase.table("instruction_group").update(
             {
                 "start_point": starting_node.i_uid,
@@ -359,6 +408,10 @@ class InstructionControl(Controller):
 
         # Check if the instruction exists
         try:
+            # SELECT *
+            # FROM instruction
+            # WHERE i_uid = i_uid
+            # AND ig_uid = ig_uid;
             _ = (
                 supabase.table("instruction")
                 .select("*")
@@ -373,6 +426,10 @@ class InstructionControl(Controller):
         user_id = supabase.auth.get_user(access_token).user.id
 
         # Gather the savepoint ID
+        # SELECT *
+        # FROM save_data
+        # WHERE account_uid = 'your_user_id_value'
+        # AND ig_uid = 'your_ig_uid_value';
         (_, data), _ = (
             supabase.table("save_data")
             .select("*")
@@ -391,6 +448,8 @@ class InstructionControl(Controller):
             )
 
             # Insert data
+            # INSERT INTO save_data (savepoint_uid, account_uid, ig_uid, i_uid)
+            # VALUES (sp_uid, user_id, ig_uid, i_uid);
             supabase.table("save_data").insert(
                 {
                     "savepoint_uid": sp_uid,
@@ -402,6 +461,10 @@ class InstructionControl(Controller):
 
         # If not, update it
         else:
+            # UPDATE save_data
+            # SET i_uid = 'your_i_uid_value'
+            # WHERE account_uid = 'your_user_id_value'
+            # AND ig_uid = 'your_ig_uid_value';
             supabase.table("save_data").update(
                 {
                     "i_uid": i_uid,
@@ -412,3 +475,57 @@ class InstructionControl(Controller):
 
         # Send updated status
         return Controller.success("Checkpoint saved")
+
+    @staticmethod
+    @Controller.return_dict_obj
+    def delete_instruction_group(ig_uid: str, access_token: str) -> DictObj:
+        """Controller to delete instruction groups"""
+
+        # Check if the instruction group exists
+        ig = InstructionControl.get_instruction_group_info(ig_uid)
+        if ig.status == "error":
+            return ig
+
+        # Get user ID
+        user_id = supabase.auth.get_user(access_token).user.id
+
+        # Check if the user is an owner of the instruction group
+        try:
+            # SELECT *
+            # FROM ownership
+            # WHERE account_uid = user_id
+            # AND ig_uid = ig_uid;
+            _ = (
+                supabase.table("ownership")
+                .select("*")
+                .eq("account_uid", user_id)
+                .eq("ig_uid", ig_uid)
+                .execute()
+            )
+        except Exception:
+            return Controller.error(
+                "You don't have ownership of this instruction group"
+            )
+
+        # Delete the user's ownership on the ownership relation
+        # DELETE FROM ownership
+        # WHERE account_uid = 'user_id'
+        # AND ig_uid = 'ig_uid';
+        supabase.table("ownership").delete().eq("account_uid", user_id).eq(
+            "ig_uid", ig_uid
+        ).execute()
+
+        # Delete all savepoint data in the save data relation
+        # DELETE FROM save_data
+        # WHERE ig_uid = 'ig_uid'
+        supabase.table("save_data").delete().eq("ig_uid", ig_uid).execute()
+
+        # Delete the the instruction group on the instruction group relation
+        # DELETE FROM instruction_group
+        # WHERE ig_uid = 'ig_uid'
+        supabase.table("instruction_group").delete().eq(
+            "ig_uid", ig_uid
+        ).execute()
+
+        # Return success message
+        return Controller.success("Deletion complete")

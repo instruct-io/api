@@ -6,14 +6,7 @@ from . import (
     update_instructions,
     get_checkpoint,
     save_checkpoint,
-)
-
-# Import JWT related libraries
-from flask_jwt_extended import (  # noqa
-    create_access_token,
-    create_refresh_token,
-    get_jwt_identity,
-    jwt_required,
+    delete_instruction_group,
 )
 
 # Flask related libraries
@@ -148,6 +141,7 @@ def save_checkpoint_endpoint(**kwargs):
     # Return the result of the new creation of an instruction group
     return res, 400 if res.status == "error" else 200
 
+
 #   endregion
 
 #
@@ -155,6 +149,23 @@ def save_checkpoint_endpoint(**kwargs):
 #   region
 #
 
-#   ! N/A
+
+@delete_instruction_group.route("/delete_instruction_group/", methods=["POST"])
+@arg_check(ARGS.instructions.delete_instruction_group)
+@token_required
+@error_handler
+def delete_instruction_group_endpoint(**kwargs):
+    """Endpoint to handle the deletion of an instruction group"""
+
+    # Extract data from the JSON body and insert user ID
+    data = DictObj(request.get_json())
+    data.access_token = kwargs["access_token"]
+
+    # Get instructions from instruction group
+    res = InstructionControl.delete_instruction_group(**data)
+
+    # Return the result of the new creation of an instruction group
+    return res, 400 if res.status == "error" else 200
+
 
 #   endregion
