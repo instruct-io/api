@@ -9,12 +9,12 @@
       "db": "Instruct"
     },
     "production": {
-      "spicer": "<< DETERMINE >>",
-      "user": "<< DETERMINE >>",
-      "password": "<< DETERMINE >>",
-      "domain": "<< DETERMINE >>",
-      "port": "<< DETERMINE >>",
-      "db": "<< DETERMINE >>"
+      "spicer": "Bruh",
+      "user": "NaviaCaspar",
+      "password": "KleeAndRazorB52Team",
+      "domain": "mongodb",
+      "port": "412",
+      "db": "Instruct"
     }
   },
   "JWT": {

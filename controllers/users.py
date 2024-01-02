@@ -44,14 +44,7 @@ class UserControl(Controller):
         query = {"email": email}
         if Controller.USER_COL.find_one(query) is None:
             # Prep data to be inserted
-            data = {
-                k: v
-                for k, v in locals().items()
-                if k not in ["kwargs", "args"]
-            }
-            data.update(
-                {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
-            )
+            data = locals()
             data["_id"] = uuid.uuid4().hex
             data["email"] = data["email"].lower()
             del data["query"]
