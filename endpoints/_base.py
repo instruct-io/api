@@ -1,18 +1,22 @@
 # Imports
-from config.config import arguments
-from typing import List, Any
+from flask_jwt_extended import jwt_required, decode_token
+from inspect import signature, Parameter
+from typing import Callable, Any, Tuple
+from util.typing import is_valid_type
 from functools import wraps
 from flask import request
-from gotrue.errors import AuthApiError
 import traceback
 
 
-# Export an arguments config variable
-ARGS = arguments.endpoints
-
-
 def success(message: str, **kwargs: Any) -> dict:
-    """Returns a message with a success status"""
+    """Return success message
+
+    Args:
+        message (str): Success message
+
+    Returns:
+        dict: Message and return code
+    """
 
     # Prep the message
     message = {"status": "success", "message": message}
@@ -23,7 +27,14 @@ def success(message: str, **kwargs: Any) -> dict:
 
 
 def client_error(message: str, **kwargs: Any) -> dict:
-    """Returns a message with a client error status"""
+    """Return a client error message
+
+    Args:
+        message (str): Message of error
+
+    Returns:
+        dict: Message and return code
+    """
 
     # Prep the message
     message = {"status": "error", "message": message}
@@ -34,7 +45,14 @@ def client_error(message: str, **kwargs: Any) -> dict:
 
 
 def server_error(message: str, **kwargs: Any) -> dict:
-    """Returns a message with a server error status"""
+    """Return a server error message
+
+    Args:
+        message (str): Message of error
+
+    Returns:
+        dict: Message and return code
+    """
     # Prep the message
     message = {"status": "error", "message": message}
     message.update(kwargs)
@@ -43,55 +61,84 @@ def server_error(message: str, **kwargs: Any) -> dict:
     return message, 500
 
 
-def arg_check(required_params: List[str]) -> object:
-    """Method that checks for minimum parameters"""
+def param_check(func: Callable) -> Callable:
+    """
+    Decorator to require specified JSON fields in a Flask route
 
-    def decorator(func: object) -> object:
-        """Decorator definition"""
+    Args:
+        func (Callable): The Flask route function to be wrapped
 
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            """Wrapping definition"""
-
-            # Get the JSON body
-            data = request.get_json()
-
-            # Return error if the body was empty
-            if data is None:
-                return client_error("JSON body is empty")
-
-            # Check if the given arguments has the minimum arguments
-            for arg in required_params:
-                if arg not in data.keys():
-                    return client_error(
-                        "Call needs the following arguments: "
-                        + ", ".join(required_params)
-                    )
-
-            # Return normally if all else is good
-            return func(*args, **kwargs)
-
-        # End of wrapper definition
-        return wrapper
-
-    # End of decorator definition
-    return decorator
-
-
-def error_handler(func: object) -> object:
-    """Decorator to handle errors inside function endpoints"""
+    Returns:
+        Callable: The wrapped function
+    """
 
     @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
-        """Wrapping definition"""
+    def decorated_function(*args: Any, **kwargs: Any) -> Tuple[Any, int]:
+        """
+        The function that is called in place of the original Flask route
+        function. This function adds additional behavior to check the JSON
+        body for required fields
+
+        Returns:
+            Tuple[Any, int]: The response from the Flask route or an error
+            message with a status code
+        """
+
+        # Get the request information
+        json_data = request.json or {}
+        if "_id" in json_data:
+            del json_data["_id"]
+
+        # Iterate through the wrapped function's parameters
+        sig = signature(func)
+        for param in sig.parameters.values():
+            # Skip if the current parameter is a kwargs
+            if param.name == "_id":
+                continue
+
+            # Skip parameters with default values if they are not in json_data
+            if (
+                param.name not in json_data
+                and param.default == Parameter.empty
+            ):
+                return client_error(f"Missing {param.name} value")
+
+            # Check type only if the parameter is in json_data
+            if param.name in json_data and param.annotation != Parameter.empty:
+                if not is_valid_type(json_data[param.name], param.annotation):
+                    return client_error(
+                        f"Invalid type for {param.name}, "
+                        + f"expected {param.annotation}"
+                    )
+
+        # Execute the wrapped function
+        return func(*args, **kwargs, **json_data)
+
+    # Execute the wrapped function
+    return decorated_function
+
+
+def error_handler(func: Callable) -> Callable:
+    """Wrap the entire endpoint with a try and except block
+
+    Args:
+        func (Callable): Function to wrap with a try and except block
+
+    Returns:
+        Callable: Result of the function or an error message
+    """
+
+    @wraps(func)
+    def decorated_function(*args: Any, **kwargs: Any) -> Any:
+        """Wrapping definition
+
+        Returns:
+            Any: Result of the function being wrapped or an error message
+        """
 
         # Try to execute the function
         try:
             return func(*args, **kwargs)
-
-        # If the error is an invalid access token, send that message
-        except AuthApiError as e:
-            return server_error(str(e))
 
         # If the exception occurs, print the error to the console and
         # return a server error response
@@ -101,15 +148,27 @@ def error_handler(func: object) -> object:
             return server_error("A server error occurred")
 
     # Return the wrapper
-    return wrapper
+    return decorated_function
 
 
-def token_required(func: object) -> object:
-    """Decorator for require token"""
+def token_required(func: Callable) -> Callable:
+    """Decorator to check if endpoint has the proper JWT passed through
+
+    Args:
+        func (Callable): Endpoint to wrap
+
+    Returns:
+        Callable: Result of the endpoint or an error message
+    """
 
     @wraps(func)
+    @jwt_required()
     def decorated_function(*args, **kwargs):
-        """Wrapping definition"""
+        """Wrapping definition
+
+        Returns:
+            Any: Result of the function being wrapped or an error message
+        """
 
         # Extract the access JWT token from the Authorization header
         auth_header = request.headers.get("Authorization")
@@ -124,7 +183,7 @@ def token_required(func: object) -> object:
             return {"error": "Authorization header is missing"}, 401
 
         # Add token to kwargs and call the original function
-        kwargs["access_token"] = token
+        kwargs["_id"] = decode_token(token)["sub"]["_id"]
         return func(*args, **kwargs)
 
     # Return the wrapper

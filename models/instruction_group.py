@@ -1,23 +1,28 @@
 # Imports
 from util.dict_obj import DictObj
-from config.config import arguments
-from datetime import datetime  # noqa
-from typing import Any
+from typing import List
 
 
 class InstructionGroup:
-    """Model class for the instruction group"""
+    """Instruction Group class model"""
 
-    # Static variable declaration
-    REQ_ARGS = arguments.models.instruction_group
+    def __init__(
+        self: "InstructionGroup",
+        _id: str,
+        name: str,
+        owner: str,
+        steps: List[dict],
+    ) -> None:
+        """Constructor for the Instruction Group class
 
-    def __init__(self: "InstructionGroup", **kwargs: Any) -> None:
-        """Constructor for an InstructionGroup instance"""
-
-        # Check if kwargs has the minimum arguments
-        for arg in InstructionGroup.REQ_ARGS.init:
-            if arg not in kwargs:
-                return False
+        Args:
+            self (InstructionGroup): Current class type
+            _id (str): ID of the instruction group
+            name (str): Name of the instruction group
+            owner (str): ID of the owner of the instruction group
+            steps (List[dict]): List of steps of the instruction group
+        """
 
         # Save info
-        self.info = DictObj(kwargs)
+        self.info = DictObj({k: v for k, v in locals().items() if k != "self"})
+        self.info.update(self.info.pop("kwargs", {}))

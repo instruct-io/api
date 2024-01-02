@@ -1,15 +1,33 @@
 {
-  "website_name": "Instruct.site",
-  "website_link": "<< TBD >>",
   "database": {
     "development": {
-      "url": "https://jzuyihauatjprrsqfizu.supabase.co",
-      "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dXlpaGF1YXRqcHJyc3FmaXp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5NzgzMDA1MCwiZXhwIjoyMDEzNDA2MDUwfQ.GorU5HeynrKjrSFU9B-C6xI75s-dH97QC5_PK1Nr7zM"
+      "spicer": "Bruh",
+      "user": "",
+      "password": "",
+      "domain": "localhost",
+      "port": "27018",
+      "db": "Instruct"
     },
     "production": {
-      "url": "<< TBD >>",
-      "key": "<< TBD >>"
+      "spicer": "<< DETERMINE >>",
+      "user": "<< DETERMINE >>",
+      "password": "<< DETERMINE >>",
+      "domain": "<< DETERMINE >>",
+      "port": "<< DETERMINE >>",
+      "db": "<< DETERMINE >>"
     }
+  },
+  "JWT": {
+    "secret": "I_FUCKING_HATE_DEADLINES",
+    "access_expiry": 8,
+    "refresh_expiry": 720,
+    "password_reset_expiry": 5
+  },
+  "email": {
+    "sender_email": "<< DETERMINE >>",
+    "smtp_server": "<< DETERMINE >>",
+    "smtp_port": 465,
+    "password": "<< DETERMINE >>"
   },
   "id_regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 }

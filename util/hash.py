@@ -3,5 +3,13 @@ import hashlib
 
 
 def sha256(string: str, seed: str) -> str:
-    """Hashes a given input with the SHA256 function"""
+    """SHA256 hasher function with spicer
+
+    Args:
+        string (str): String to hash
+        seed (str): Spicer
+
+    Returns:
+        str: Hashed string
+    """
     return hashlib.sha256((string+seed).encode()).hexdigest()
